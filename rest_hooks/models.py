@@ -66,7 +66,7 @@ class Hook(models.Model):
             'data': serializers.serialize('python', [instance])[0]
         }
 
-    def deliver_hook(self, instance, payload_override=None):
+    def deliver_hook(self, instance, payload_override=None, **kwargs):
         """
         Deliver the payload to the target URL.
 
@@ -75,12 +75,14 @@ class Hook(models.Model):
         payload = payload_override or self.serialize_hook(instance)
         if getattr(settings, 'HOOK_DELIVERER', None):
             deliverer = get_module(settings.HOOK_DELIVERER)
-            deliverer(self.target, payload, instance=instance, hook=self)
+            deliverer(self.target, payload, instance=instance, hook=self, **kwargs)
         else:
+            headers = kwargs.pop('headers', {})
+            headers.update({'Content-Type': 'application/json'})
             client.post(
                 url=self.target,
                 data=json.dumps(payload, cls=serializers.json.DjangoJSONEncoder),
-                headers={'Content-Type': 'application/json'}
+                headers=headers
             )
 
         signals.hook_sent_event.send_robust(sender=self.__class__, payload=payload, instance=instance, hook=self)
@@ -137,7 +139,7 @@ def custom_action(sender, action,
     """
     opts = get_opts(instance)
     model = '.'.join([opts.app_label, opts.object_name])
-    distill_model_event(instance, model, action, user_override=user)
+    distill_model_event(instance, model, action, user_override=user, **kwargs)
 
 @receiver(raw_hook_event, dispatch_uid='raw-custom-hook')
 def raw_custom_event(sender, event_name,
