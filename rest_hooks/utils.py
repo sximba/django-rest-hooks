@@ -23,7 +23,7 @@ def get_module(path):
 
     return func
 
-def find_and_fire_hook(event_name, instance, user_override=None):
+def find_and_fire_hook(event_name, instance, user_override=None, **kwargs):
     """
     Look up Hooks that apply
     """
@@ -48,9 +48,9 @@ def find_and_fire_hook(event_name, instance, user_override=None):
 
     hooks = Hook.objects.filter(user=user, event=event_name)
     for hook in hooks:
-        hook.deliver_hook(instance)
+        hook.deliver_hook(instance, **kwargs)
 
-def distill_model_event(instance, model, action, user_override=None):
+def distill_model_event(instance, model, action, user_override=None, **kwargs):
     """
     Take created, updated and deleted actions for built-in 
     app/model mappings, convert to the defined event.name
@@ -69,4 +69,8 @@ def distill_model_event(instance, model, action, user_override=None):
                 event_name = maybe_event_name
 
     if event_name:
-        find_and_fire_hook(event_name, instance, user_override=user_override)
+        find_and_fire_hook(
+                event_name,
+                instance,
+                user_override=user_override,
+                **kwargs)
