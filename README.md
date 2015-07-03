@@ -33,7 +33,7 @@ If you want to make a Django form or API resource, you'll need to do that yourse
 Running the tests for Django REST Hooks is very easy, just:
 
 ```
-git clone https://github.com/zapier/django-rest-hooks && cd django-rest-hooks
+git clone https://github.com/sximba/django-rest-hooks && cd django-rest-hooks
 ```
 
 Next, you'll want to make a virtual environment (we recommend using virtualenvwrapper
@@ -56,7 +56,7 @@ python runtests.py
 We recommend pip to install Django REST Hooks:
 
 ```
-pip install django-rest-hooks
+pip install git+https://github.com/sximba/django-rest-hooks.git@master#egg=rest_hooks
 ```
 
 Next, you'll need to add `rest_hooks` to `INSTALLED_APPS` and configure
@@ -116,7 +116,8 @@ class Book(models.Model):
         hook_event.send(
             sender=self.__class__,
             event_name='book.read',
-            obj=self # the Book object
+            obj=self, # the Book object
+            headers={'Authorization': 'Bearer oath2_token'} # Any custom headers
         )
 ```
 
@@ -181,7 +182,8 @@ raw_hook_event.send(
         'email': user.email,
         'when': datetime.datetime.now().isoformat()
     },
-    user=user # required: used to filter Hooks
+    user=user, # required: used to filter Hooks
+    headers={'Authorization': 'Bearer oath2_token'} # Any custom headers
 )
 ```
 

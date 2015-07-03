@@ -1,4 +1,4 @@
-Django REST Hooks is written and maintained by Zapier and
+Django REST Hooks was forked from Zapier and has
 various contributors:
 
 
@@ -9,4 +9,5 @@ various contributors:
 
 ## Patches and Suggestions
 
-- You?
+- Eric man
+- Sandile Ximba
